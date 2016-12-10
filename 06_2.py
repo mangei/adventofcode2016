@@ -2,7 +2,7 @@
 #2016, 06, 2
 
 # python 06_2.py < input_06.txt
-# correct answer: 
+# correct answer: akothqli
 
 # --- Part Two ---
 #
