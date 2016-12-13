@@ -37,8 +37,9 @@ def get_elements(element):
             within_marker = True
             pos += 1
 
-            data_sizes.append((1, True, len(data), data))
-            data = []
+            if len(data) > 0:
+                data_sizes.append((1, True, len(data), data))
+                data = []
         elif string[pos] == ")":
             within_marker = False
             pos += 1
@@ -49,8 +50,6 @@ def get_elements(element):
 
             data_sizes.append((repeat_count, False, string[pos:pos + data_size], ""))
 
-            repeat_data = string[pos:(pos + data_size)]
-
             pos += data_size
             marker = []
         else:
@@ -60,7 +59,8 @@ def get_elements(element):
                 data.append(string[pos])
             pos += 1
 
-    data_sizes.append((1, True, len(data), data))
+    if len(data) > 0:
+        data_sizes.append((1, True, len(data), data))
 
     return data_sizes
 
