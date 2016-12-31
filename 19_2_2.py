@@ -1,9 +1,7 @@
 # Advent Of Code 2016 - http://adventofcode.com/2016
 
-# python 19_2.py
-# correct answer:
-
-# TAKES TOOOO LONG
+# python 19_2_2.py
+# correct answer: 1424135
 
 # --- Part Two ---
 #
@@ -48,6 +46,8 @@
 # Your puzzle input is still 3018458.
 import sys
 
+import time
+
 __author__ = "Manuel Geier (manuel@geier.io)"
 
 puzzle_input = 3018458
@@ -57,41 +57,50 @@ class WhiteElephantParty:
     def __init__(self, elf_count):
         self.elf_count = elf_count
         self.elves_with_presents_count = elf_count
-        self.elves = [1 for i in range(elf_count)]
+        self.elves = [(i + 1) for i in range(elf_count)]
 
     def movePresentsFromTo(self, fromIndex, toIndex):
-        self.elves[toIndex] += self.elves[fromIndex]
-        self.elves[fromIndex] = 0
+        # print(self.elves[toIndex], self.elves, self.elves[fromIndex])
+        del self.elves[fromIndex]
+        # print(" ", self.elves)
         self.elves_with_presents_count -= 1
 
-    def hasPresents(self, index):
-        return self.elves[index] > 0
-
-    def getNextElfIndex(self, index, skip=0):
-        for i in range(1, self.elf_count + 1):
-            currentIndex = (index + i) % self.elf_count
-            if self.hasPresents(currentIndex):
-                if skip == 0:
-                    return currentIndex
-                skip -= 1
-
     def getOppositeElfIndex(self, index):
-        skip_elves = int(self.elves_with_presents_count / 2) - 1
-        oppositeElfIndex = self.getNextElfIndex(index, skip_elves)
-        return oppositeElfIndex
+        oppositeElfIndex = (index + int(self.elves_with_presents_count / 2)) % self.elves_with_presents_count
+        return oppositeElfIndex if oppositeElfIndex != index else None
 
     def getWinningElf(self):
+        print("start", self.elf_count)
+        sys.stdout.flush()
+
+        tBegin = time.time()
+        t = time.time()
+
         currentElfIndex = 0
         while True:
             oppositeElfIndex = self.getOppositeElfIndex(currentElfIndex)
             if oppositeElfIndex is not None:
                 self.movePresentsFromTo(oppositeElfIndex, currentElfIndex)
-                currentElfIndex = self.getNextElfIndex(currentElfIndex)
+                if oppositeElfIndex < currentElfIndex:
+                    # element before the current was deleted, hence, we don't have to increment, since it incremented
+                    # "implicitly"
+                    pass
+                else:
+                    currentElfIndex += 1
+                currentElfIndex %= self.elves_with_presents_count
             else:
                 break
 
-        # increase by one, since it starts with 1
-        return currentElfIndex + 1
+            if self.elves_with_presents_count % 10000 == 0:
+                tCur = time.time()
+                print(self.elves_with_presents_count, tCur - t, tCur - tBegin)
+                t = tCur
+                sys.stdout.flush()
+
+        print("total time", time.time() - tBegin)
+        sys.stdout.flush()
+
+        return self.elves[currentElfIndex]
 
 
 def main():
@@ -115,9 +124,6 @@ def main():
 
     whiteElephantParty = WhiteElephantParty(7)
     assert whiteElephantParty.getWinningElf() == 5
-
-    print("tests passed. run puzzle input...")
-    sys.stdout.flush()
 
     whiteElephantParty = WhiteElephantParty(puzzle_input)
     print("final elf", whiteElephantParty.getWinningElf())
